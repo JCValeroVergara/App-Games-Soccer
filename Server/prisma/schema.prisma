@@ -1,0 +1,59 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Games {
+  id          Int       @id @default(autoincrement())
+  date        DateTime  @default(now())
+  schedule    DateTime  @db.Timestamp(2)
+  teamHome    Teams     @relation("HomeTeam", fields: [teamHomeId], references:[id])
+  teamHomeId  Int
+  teamAway    Teams     @relation("AwayTeam", fields: [teamAwayId], references: [id])
+  teamAwayId  Int
+  field       Fields    @relation(fields: [fieldId], references: [id])
+  fieldId     Int
+  status      String    @default("scheduled")
+}
+
+model Fields {
+  id          Int       @id @default(autoincrement())
+  name        String
+  city        String
+  neighborhood String
+  address     String
+  phone       String
+  image       Json?     @default("{}")
+  games       Games[]
+}
+
+model Teams {
+  id          Int       @id @default(autoincrement())
+  name        String
+  city        String
+  neighborhood String
+  manager     String
+  managerPhone String
+  image       Json?     @default("{}")
+  players     Players[]
+
+  homeGames   Games[]   @relation("HomeTeam")
+  awayGames   Games[]   @relation("AwayTeam")
+}
+
+model Players {
+  id          Int       @id @default(autoincrement())
+  name        String
+  phone       String
+  position    String
+  image       Json?     @default("{}")
+  team        Teams     @relation(fields: [teamId], references: [id])
+  teamId      Int
+}

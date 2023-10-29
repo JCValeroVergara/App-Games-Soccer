@@ -1,0 +1,11 @@
+-- AlterTable
+ALTER TABLE "Fields" ALTER COLUMN "image" DROP NOT NULL,
+ALTER COLUMN "image" SET DEFAULT '{}';
+
+-- AlterTable
+ALTER TABLE "Players" ALTER COLUMN "image" DROP NOT NULL,
+ALTER COLUMN "image" SET DEFAULT '{}';
+
+-- AlterTable
+ALTER TABLE "Teams" ALTER COLUMN "image" DROP NOT NULL,
+ALTER COLUMN "image" SET DEFAULT '{}';
