@@ -30,7 +30,7 @@ model Fields {
   neighborhood String
   address     String
   phone       String
-  image       Json?     @default("{}")
+  image       String?
   games       Games[]
 }
 
@@ -41,7 +41,7 @@ model Teams {
   neighborhood String
   manager     String
   managerPhone String
-  image       Json?     @default("{}")
+  image       String?
   players     Players[]
 
   homeGames   Games[]   @relation("HomeTeam")
@@ -53,7 +53,7 @@ model Players {
   name        String
   phone       String
   position    String
-  image       Json?     @default("{}")
+  image       String?
   team        Teams     @relation(fields: [teamId], references: [id])
   teamId      Int
 }

@@ -7,7 +7,6 @@
     "dev": "nodemon src/index.js",
     "start": "node src/index.js",
     "test": "jest"
-
   },
   "author": "Juan Carlos Valero",
   "license": "ISC",

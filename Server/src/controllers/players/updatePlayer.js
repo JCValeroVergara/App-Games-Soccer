@@ -12,6 +12,7 @@ const updatePlayer = async (id, data) => {
       phone: data.phone,
       position: data.position,
       teamId: data.teamId,
+      image: data.image,
     },
   });
   return player;

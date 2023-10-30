@@ -5,10 +5,10 @@ const createPlayer = async (data) => {
   const player = await prisma.players.create({
     data: {
       name: data.name,
-      email: data.email,
       phone: data.phone,
       position: data.position,
       teamId: data.teamId,
+      image: data.image,
     },
   });
   return player;
