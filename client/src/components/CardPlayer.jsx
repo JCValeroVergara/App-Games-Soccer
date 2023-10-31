@@ -3,7 +3,6 @@ import ImagenDefault from '../assets/ImageDefault.jpg';
 import { Delete, Edit } from '../icons';
 import DeletePlayer from '../layouts/players/DeletePlayer';
 import UpdatePlayer from '../layouts/players/UpdatePlayer';
-import SuccesfullRegisterToast from './SuccesfullRegisterToast';
 
 
 const CardPlayer = ({ id,name, phone, position, image, team}) => {
@@ -14,8 +13,7 @@ const CardPlayer = ({ id,name, phone, position, image, team}) => {
 
   const [activeForm, setActiveForm] = useState(null);
   const [playerSelected, setPlayerSelected] = useState(null);
-  const [isSuccessFull, setIsSuccessFull] = useState(false);
-
+  
   const handleShowUpdate = (id) => {
     setActiveForm("update");
     setPlayerSelected(id);
@@ -37,22 +35,11 @@ const CardPlayer = ({ id,name, phone, position, image, team}) => {
 
   return (
     <>
-      {isSuccessFull && (
-        <SuccesfullRegisterToast
-          message={'Proceso realizado con éxito'}
-          onClose={() => setIsSuccessFull(false)}
-        />
-      )}
       {activeForm === 'update' && (
         <UpdatePlayer
           id={playerSelected}
           name={name}
-          phone={phone}
-          position={position}
-          image={image}
-          team={team}
           onClose={handleCloseUpdate}
-          showtoast={() => setIsSuccessFull(true)}
         />
       )}
       {activeForm === 'delete' && (
@@ -64,7 +51,6 @@ const CardPlayer = ({ id,name, phone, position, image, team}) => {
           image={image}
           team={team}
           onClose={handleCloseDelete}
-          showtoast={() => setIsSuccessFull(true)}
         />
       )}
       <div className="p-4">

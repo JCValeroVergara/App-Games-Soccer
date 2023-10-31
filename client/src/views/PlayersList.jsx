@@ -98,7 +98,8 @@ const PlayersList = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
-          {filteredPlayers.map((player) => (
+          {filteredPlayers.map((player, index) => (
+            <div key={index}>
             <CardPlayer
               key={player.id}
               id={player.id}
@@ -107,7 +108,8 @@ const PlayersList = () => {
               position={player.position}
               image={player.image ? player.image : ImagenDefault}
               team={player.team?.name}
-            />
+              />
+            </div>
           ))}
         </div>
       </div>

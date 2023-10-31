@@ -58,7 +58,6 @@ const CreatePlayer = ({ onClose, showtoast }) => {
       }));
     } catch (error) {
       console.error('Error uploading file:', error);
-      // Manejar cualquier error de carga de archivos aquí
     }
   } else {
     setPlayerData((prevData) => ({
