@@ -1,21 +1,21 @@
 
-const validation = (data) => {
+const validation = (PlayerData) => {
   const errors = {};
 
-  if (!data.name) {
-    errors.name = 'Debes incluir tu nombre';
+  if (!PlayerData.name) {
+    errors.fields = 'Debes incluir tu nombre';
   }
 
-  if (!data.phone) {
-    errors.phone = 'Debes incluir el numero telefónico';
+  if (!PlayerData.phone) {
+    errors.fields = 'Debes incluir el número telefónico';
   }
 
-  if (!data.position) {
-    errors.position = 'Debes incluir la posición de juego';
+  if (!PlayerData.position) {
+    errors.fields = 'Debes incluir la posición de juego';
   }
 
-  if (!data.teamId) {
-    errors.teamId = 'Debes seleccionar un equipo';
+  if (!PlayerData.teamId) {
+    errors.fields = 'Debes seleccionar un equipo';
   }
 
   return errors;

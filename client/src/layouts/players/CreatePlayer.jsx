@@ -8,7 +8,7 @@ import validation from '../../validations/validationsPlayer';
 import ApiUrl from '../../utils/ApiUrl';
 import AlertMessage from '../../components/AlertMessage';
 
-const CreatePlayer = ({onClose}) => {
+const CreatePlayer = ({ onClose, showtoast }) => {
   const dispatch = useDispatch();
   const teams = useSelector(selectTeams);
 
@@ -27,6 +27,7 @@ const CreatePlayer = ({onClose}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [selectedFile, setSelectedFile] = useState(null);
+  // eslint-disable-next-line
   const [imageDefault, setImageDefault] = useState(imageDefaultA);
   const [selectedTeamId, setSelectedTeamId] = useState('');
   const [selectedPosition, setSelectedPosition] = useState('');
@@ -43,39 +44,45 @@ const CreatePlayer = ({onClose}) => {
     setPlayerData((prevData) => ({ ...prevData, teamId: selectedTeamId }));
   };
 
-  const handleChange = (event) => {
-    if (event.target.name === 'image') {
-      setSelectedFile(event.target.files[0]);
-      setImageDefault(URL.createObjectURL(event.target.files[0]));
-    } else {
+  const handleChange = async (event) => {
+  if (event.target.name === 'image') {
+    const file = event.target.files[0];
+    setSelectedFile(file);
+    setImageDefault(URL.createObjectURL(file));
+
+    try {
+      const imageUrl = await uploadFile(file);
       setPlayerData((prevData) => ({
         ...prevData,
-        [event.target.name]: event.target.value,
+        image: imageUrl,
       }));
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      // Manejar cualquier error de carga de archivos aquí
     }
+  } else {
+    setPlayerData((prevData) => ({
+      ...prevData,
+      [event.target.name]: event.target.value,
+    }));
+  }
+};
+
+
+  const hanleSuccessfullRegister = () => {
+    onClose();
+    showtoast();
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setIsLoading(true);
-
+    
     const fieldErrors = validation(PlayerData);
     setErrors(fieldErrors);
 
     if (Object.keys(fieldErrors).length === 0) {
       try {
-        let imageUrl = null;
-
-        if (selectedFile) {
-          imageUrl = await uploadFile(selectedFile);
-          console.log(imageUrl); 
-
-          setPlayerData((prevData) => ({
-            ...prevData,
-            image: imageUrl,
-          }));
-        }
-
         const response = await fetch(`${ApiUrl}/players`, {
           method: 'POST',
           headers: {
@@ -84,11 +91,11 @@ const CreatePlayer = ({onClose}) => {
           body: JSON.stringify(PlayerData),
         });
 
-        if (response.status === 201) {
+      if (response.status === 201) {
           const data = await response.json();
           console.log(data);
-          setIsLoading(false);
-          onClose();
+          dispatch(fetchTeams());
+          hanleSuccessfullRegister();
         } else {
           const errorData = await response.json();
           console.log(errorData);
@@ -97,8 +104,8 @@ const CreatePlayer = ({onClose}) => {
         console.log(error);
       }
     }
+    setIsLoading(false);
   };
-
 
   //Posiciones
   const positions = [
@@ -113,7 +120,7 @@ const CreatePlayer = ({onClose}) => {
       <div className="flex flex-col flex-wrap w-full items-center justify-center px-6 py-8 mx-auto ">
         <div className="w-full h-max bg-gray-700 dark:bg-gray-800 dark:border-gray-100 rounded-lg shadow border md:mt-0 sm:max-w-md xl:p-0">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
-            <h1 className="text-black dark:text-white text-xl font-bold leading-tight tracking-tight  text-center">
+            <h1 className="text-slate-100 dark:text-white text-xl font-bold leading-tight tracking-tight  text-center">
               Crea un nuevo jugador
             </h1>
             {isLoading ? (
@@ -132,9 +139,11 @@ const CreatePlayer = ({onClose}) => {
                       w-32 h-32 rounded-md ring-4 ring-gray-300 dark:ring-gray-700 object-cover opacity-100 scale-100"
                     }`}
                   alt="Imagen de perfil"
-                  src={selectedFile
-                        ? URL.createObjectURL(selectedFile)
-                        : imageDefaultA}
+                  src={
+                    selectedFile
+                      ? URL.createObjectURL(selectedFile)
+                      : imageDefaultA
+                  }
                 />
                 <input
                   type="file"
@@ -212,25 +221,19 @@ const CreatePlayer = ({onClose}) => {
                 <div className="flex flex-wrap justify-center space-x-4">
                   <button
                     type="submit"
-                    className="w-24 text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-green-800 font-medium rounded-lg text-sm py-2.5 text-center"
+                    className="w-24 text-white bg-blue-600 hover:bg-green-500 focus:ring-4 focus:outline-none focus:ring-green-800 font-medium rounded-lg text-sm py-2.5 text-center"
                   >
                     Crear
                   </button>
                   <button
-                    className="w-24 text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-800 font-medium rounded-lg text-sm py-2.5 text-center"
+                    className="w-24 text-white bg-blue-600 hover:bg-red-500 focus:ring-4 focus:outline-none focus:ring-red-800 font-medium rounded-lg text-sm py-2.5 text-center"
                     onClick={() => onClose()}
-                    >
+                  >
                     Cancelar
                   </button>
                 </div>
               </form>
             )}
-            {/* {showAlertModal && (
-              <SuccesfullRegister
-                onClick={handlerProcesoExitoso}
-                message={`Se ha creado el registro con éxito, la contraseña se envió al correo ${userData.email}.`}
-              />
-            )} */}
           </div>
         </div>
       </div>

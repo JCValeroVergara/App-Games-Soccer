@@ -5,6 +5,7 @@ import { fetchPlayers, selectPlayers } from '../redux/features/playersSlice';
 import { Add, Magnifier } from '../icons';
 import ImagenDefault from '../assets/ImageDefault.jpg';
 import CreatePlayer from '../layouts/players/CreatePlayer';
+import SuccesfullRegisterToast from '../components/SuccesfullRegisterToast';
 
 
 const PlayersList = () => {
@@ -13,8 +14,7 @@ const PlayersList = () => {
   const [isInputVisible, setIsInputVisible] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [activeForm, setActiveForm] = useState(null);
-
-  console.log(players);
+  const [isSuccessFull, setIsSuccessFull] = useState(false);
   
   useEffect(() => {
     dispatch(fetchPlayers());
@@ -52,35 +52,48 @@ const PlayersList = () => {
     setActiveForm(null);
   };
 
+
   return (
     <>
-      {activeForm === 'create' && <CreatePlayer onClose={handleCloseCreate} />}
+      {isSuccessFull && (
+        <SuccesfullRegisterToast
+          message={'Proceso realizado con éxito'}
+          onClose={() => setIsSuccessFull(false)}
+        />
+      )}
+      {activeForm === 'create' && (
+        <CreatePlayer
+          onClose={handleCloseCreate}
+          showtoast={() => setIsSuccessFull(true)}
+          />
+      )}
       <div className="flex flex-col w-full h-screen">
         <h1>PlayersList</h1>
-        <div className="flex items-center space-x-2 justify-center">
+        <div className="flex mx-8 items-center space-x-2 justify-end">
           <button
-            className="p-1.5 border border-[#012970] dark:border-white rounded-md hover:bg-slate-200 transition"
+            title="Buscar"
+            className="p-1.5 border border-[#012970] rounded-md bg-slate-200 hover:bg-emerald-300 transition"
             onClick={handleMagnifierClick}
           >
-            <Magnifier className="invert-[.15] dark:invert-[.82]" />
+            <Magnifier />
           </button>
           {isInputVisible && (
             <input
               name="name"
               id="name"
               type="text"
-              placeholder="buscar jugador"
-              className="w-9/12 bg-transparent px-2 py-1 pl-6 text-[#012970] dark:text-slate-100 placeholder:text-[#012970] dark:placeholder:text-slate-300"
+              placeholder="Buscar jugador"
+              className="w-80 bg-transparent px-2 py-1 pl-6 text-slate-50 dark:text-slate-100 placeholder:text-slate-50 dark:placeholder:text-slate-300 shadow rounded-md"
               value={inputValue}
               onChange={handleInputChange}
             />
           )}
           <button
-            title="Nuevo"
-            className="p-2 border border-[#012970] dark:border-white rounded-md hover:bg-slate-200 transition"
+            title="Crear Nuevo"
+            className="p-2 border border-[#012970] bg-slate-200 rounded-md hover:bg-emerald-300 transition"
             onClick={handleShowCreate}
           >
-            <Add className="w-3 h-3 dark:invert hover:dark:invert-0" />
+            <Add className="w-3 h-3" />
           </button>
         </div>
 

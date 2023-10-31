@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
 import {MobileMenu} from '../icons';
+import { useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen);
-  };
-
+  
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
@@ -23,7 +20,7 @@ const Navbar = () => {
           <div className="flex space-x-4">
             <button
               className="text-white hover:bg-gray-700 px-3 py-2 rounded"
-              onClick={toggleDropdown}
+              onClick={()=>navigate('/')}
             >
               Juegos
             </button>
@@ -33,7 +30,10 @@ const Navbar = () => {
             <button className="text-white hover:bg-gray-700 px-3 py-2 rounded">
               Equipos
             </button>
-            <button className="text-white hover:bg-gray-700 px-3 py-2 rounded">
+            <button
+              className="text-white hover:bg-gray-700 px-3 py-2 rounded"
+              onClick={()=>navigate('/players')}
+            >
               Jugadores
             </button>
           </div>
@@ -51,25 +51,25 @@ const Navbar = () => {
         <div className="md:hidden">
           <button
             className="block text-white text-left px-4 py-2 hover:bg-gray-700"
-            onClick={toggleDropdown}
+            onClick={()=>navigate('/')}
           >
             Juegos
           </button>
           <button
             className="block text-white text-left px-4 py-2 hover:bg-gray-700"
-            onClick={toggleMobileMenu}
+            // onClick={toggleMobileMenu}
           >
             Campos
           </button>
           <button
             className="block text-white text-left px-4 py-2 hover:bg-gray-700"
-            onClick={toggleMobileMenu}
+            // onClick={toggleMobileMenu}
           >
             Equipos
           </button>
           <button
             className="block text-white text-left px-4 py-2 hover:bg-gray-700"
-            onClick={toggleMobileMenu}
+            onClick={()=>navigate('/players')}
           >
             Jugadores
           </button>
