@@ -24,10 +24,16 @@ const Navbar = () => {
             >
               Juegos
             </button>
-            <button className="text-white hover:bg-gray-700 px-3 py-2 rounded">
+            <button
+              className="text-white hover:bg-gray-700 px-3 py-2 rounded"
+              onClick={()=>navigate('/fields')}
+            >
               Campos
             </button>
-            <button className="text-white hover:bg-gray-700 px-3 py-2 rounded">
+            <button
+              className="text-white hover:bg-gray-700 px-3 py-2 rounded"
+              onClick={()=>navigate('/teams')}
+            >
               Equipos
             </button>
             <button
@@ -51,25 +57,37 @@ const Navbar = () => {
         <div className="md:hidden">
           <button
             className="block text-white text-left px-4 py-2 hover:bg-gray-700"
-            onClick={()=>navigate('/')}
+            onClick={() => {
+              navigate('/')
+              setIsMobileMenuOpen(false)
+            }}
           >
             Juegos
           </button>
           <button
             className="block text-white text-left px-4 py-2 hover:bg-gray-700"
-            // onClick={toggleMobileMenu}
+            onClick={() => {
+              navigate('/fields');
+              setIsMobileMenuOpen(false)
+            }}
           >
             Campos
           </button>
           <button
             className="block text-white text-left px-4 py-2 hover:bg-gray-700"
-            // onClick={toggleMobileMenu}
+            onClick={() => {
+              navigate('/teams');
+              setIsMobileMenuOpen(false)
+            }}
           >
             Equipos
           </button>
           <button
             className="block text-white text-left px-4 py-2 hover:bg-gray-700"
-            onClick={()=>navigate('/players')}
+            onClick={() =>{
+              navigate('/players');
+              setIsMobileMenuOpen(false)
+            }}
           >
             Jugadores
           </button>

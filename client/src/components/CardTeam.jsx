@@ -1,22 +1,21 @@
 import React, { useState } from 'react';
-import ImagenDefault from '../assets/ImageDefault.jpg';
+import ImageTeamDefault from '../assets/imageTeamDefault.png';
+import DeleteTeam from '../layouts/teams/DeleteTeam';
+import UpdateTeam from '../layouts/teams/UpdateTeam';
 import { Delete, Edit } from '../icons';
-import DeletePlayer from '../layouts/players/DeletePlayer';
-import UpdatePlayer from '../layouts/players/UpdatePlayer';
 
-
-const CardPlayer = ({ id,name, phone, position, image, team}) => {
-  let imageUrl = image; // Inicializar imageUrl con el valor de image
+const CardTeam = ({ id, name, city, neighborhood, manager, managerPhone, image }) => {
+  let imageUrl = image;
   if (!image || Object.keys(image).length === 0) {
-    imageUrl = ImagenDefault; // Si image está vacío, establecer imageUrl como la imagen por defecto
+    imageUrl = ImageTeamDefault;
   }
 
   const [activeForm, setActiveForm] = useState(null);
-  const [playerSelected, setPlayerSelected] = useState(null);
-  
+  const [teamSelected, setTeamSelected] = useState(null);
+
   const handleShowUpdate = (id) => {
-    setActiveForm("update");
-    setPlayerSelected(id);
+    setActiveForm('update');
+    setTeamSelected(id);
   };
 
   const handleCloseUpdate = () => {
@@ -24,29 +23,28 @@ const CardPlayer = ({ id,name, phone, position, image, team}) => {
   };
 
   const handleShowDelete = (id) => {
-    setActiveForm("delete");
-    setPlayerSelected(id);
+    setActiveForm('delete');
+    setTeamSelected(id);
   };
 
   const handleCloseDelete = () => {
     setActiveForm(null);
   };
 
-
   return (
     <>
       {activeForm === 'update' && (
-        <UpdatePlayer
-          id={playerSelected}
+        <UpdateTeam
+          id={teamSelected}
           name={name}
           onClose={handleCloseUpdate}
         />
       )}
       {activeForm === 'delete' && (
-        <DeletePlayer
-          id={playerSelected}
+        <DeleteTeam
+          id={teamSelected}
           name={name}
-          position={position}
+          city={city}
           onClose={handleCloseDelete}
         />
       )}
@@ -61,9 +59,10 @@ const CardPlayer = ({ id,name, phone, position, image, team}) => {
           </div>
           <div className="px-6 py-4">
             <div className="font-bold text-xl mb-1">{name}</div>
-            <p className="text-gray-700 text-sm">{phone}</p>
-            <p className="text-gray-700 text-sm">{position}</p>
-            <p className="text-gray-700 text-xs">{team}</p>
+            <p className="text-gray-700 text-sm">{city}</p>
+            <p className="text-gray-700 text-sm">{neighborhood}</p>
+            <p className="text-gray-700 text-xs">{manager}</p>
+            <p className="text-gray-700 text-xs">{managerPhone}</p>
           </div>
           <div className="flex justify-end px-6 space-x-2 pb-2">
             <button
@@ -87,4 +86,4 @@ const CardPlayer = ({ id,name, phone, position, image, team}) => {
   );
 };
 
-export default CardPlayer;
+export default CardTeam;

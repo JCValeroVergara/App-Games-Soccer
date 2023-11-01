@@ -1,33 +1,32 @@
 import React, { useEffect, useState } from 'react';
-import CardPlayer from '../components/CardPlayer';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchPlayers, selectPlayers } from '../redux/features/playersSlice';
-import { Add, Magnifier } from '../icons';
-import ImagenDefault from '../assets/ImageDefault.jpg';
-import CreatePlayer from '../layouts/players/CreatePlayer';
+import { fetchTeams, selectTeams } from '../redux/features/teamsSlice';
+import CardTeam from '../components/CardTeam';
+import CreateTeam from '../layouts/teams/CreateTeam';
 import SuccesfullRegisterToast from '../components/SuccesfullRegisterToast';
+import ImageTeamDefault from '../assets/imageTeamDefault.png';
+import { Add, Magnifier } from '../icons';
 
-
-const PlayersList = () => {
+const TeamsList = () => {
   const dispatch = useDispatch();
-  const players = useSelector(selectPlayers);
+  const teams = useSelector(selectTeams)
   const [isInputVisible, setIsInputVisible] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [activeForm, setActiveForm] = useState(null);
   const [isSuccessFull, setIsSuccessFull] = useState(false);
-  
+
   useEffect(() => {
-    dispatch(fetchPlayers());
-  }, [dispatch]);
+    dispatch(fetchTeams())
+  }, [dispatch])
 
-  let filteredPlayers = []
+  let filteredTeams = []
 
-  if (players) {
-    filteredPlayers = [...players];
+  if (teams) {
+    filteredTeams = teams;
     if (inputValue) {
-      filteredPlayers = players.filter((player) => {
-        return player.name.toLowerCase().includes(inputValue.toLowerCase());
-      });
+      filteredTeams = teams.filter((team) => {
+        return team.name.toLowerCase().includes(inputValue.toLowerCase());
+      })
     }
   }
 
@@ -45,13 +44,12 @@ const PlayersList = () => {
   };
 
   const handleShowCreate = () => {
-    setActiveForm("create");
+    setActiveForm('create');
   };
 
   const handleCloseCreate = () => {
     setActiveForm(null);
   };
-
 
   return (
     <>
@@ -62,7 +60,7 @@ const PlayersList = () => {
         />
       )}
       {activeForm === 'create' && (
-        <CreatePlayer
+        <CreateTeam
           onClose={handleCloseCreate}
           showtoast={() => setIsSuccessFull(true)}
         />
@@ -82,7 +80,7 @@ const PlayersList = () => {
               name="name"
               id="name"
               type="text"
-              placeholder="Buscar jugador"
+              placeholder="Buscar el equipo"
               className="w-80 bg-transparent px-2 py-1 pl-6 text-slate-50 dark:text-slate-100 placeholder:text-slate-50 dark:placeholder:text-slate-300 shadow rounded-md"
               value={inputValue}
               onChange={handleInputChange}
@@ -98,18 +96,19 @@ const PlayersList = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
-          {[...filteredPlayers]
+          {[...filteredTeams]
             .sort((a, b) => a.name.localeCompare(b.name))
-            .map((player, index) => (
+            .map((team, index) => (
               <div key={index}>
-                <CardPlayer
-                  key={player.id}
-                  id={player.id}
-                  name={player.name}
-                  phone={player.phone}
-                  position={player.position}
-                  image={player.image ? player.image : ImagenDefault}
-                  team={player.team ? player.team.name || 'Libre' : 'Libre'}
+                <CardTeam
+                  key={team.id}
+                  id={team.id}
+                  name={team.name}
+                  city={team.city}
+                  neighborhood={team.neighborhood}
+                  manager={team.manager}
+                  managerPhone={team.managerPhone}
+                  image={team.image ? team.image : ImageTeamDefault}
                 />
               </div>
             ))}
@@ -119,4 +118,4 @@ const PlayersList = () => {
   );
 };
 
-export default PlayersList;
+export default TeamsList;

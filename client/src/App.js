@@ -1,8 +1,11 @@
 import { Routes, Route } from 'react-router-dom';
 import NavBar from './components/Navbar';
-import Landing from './views/Landing';
-import PlayersList from './views/PlayersList';
 import backgroundImage from './assets/bg.jpg';
+import GamesList from './views/GamesList';
+import TeamsList from './views/TeamsList';
+import PlayersList from './views/PlayersList';
+
+
 
 function App() {
   return (
@@ -15,8 +18,10 @@ function App() {
     <NavBar/>
       <article className="flex flex-col w-full h-auto items-center justify-center p-2.5">
         <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route path="/players" element={<PlayersList />} />  
+          <Route path="/" element={<GamesList />} />
+          <Route path="/fields" element={<TeamsList />} />
+          <Route path="/teams" element={<TeamsList />} />
+          <Route path="/players" element={<PlayersList />} />
         </Routes>
       </article>
     </div>

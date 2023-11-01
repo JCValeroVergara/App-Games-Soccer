@@ -1,111 +1,96 @@
 import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import Spinner from '../../components/Spinner';
-import { fetchTeams, selectTeams } from '../../redux/features/teamsSlice';
-import { fetchPlayers } from '../../redux/features/playersSlice';
-import imageDefaultA from '../../assets/ImageDefault.jpg';
-import { uploadFile } from '../../utils/firebase/config';
-import validation from '../../validations/validationsPlayer';
+import { useDispatch } from 'react-redux';
+import { fetchTeams} from '../../redux/features/teamsSlice';
+import validation from '../../validations/validationsTeams';
 import ApiUrl from '../../utils/ApiUrl';
+import { uploadFile } from '../../utils/firebase/config';
+import imageDefaultA from '../../assets/imageTeamDefault.png';
 import AlertMessage from '../../components/AlertMessage';
+import Spinner from '../../components/Spinner';
 
-const CreatePlayer = ({ onClose, showtoast }) => {
+const CreateTeam = ({ onClose, showtoast }) => {
   const dispatch = useDispatch();
-  const teams = useSelector(selectTeams);
 
   useEffect(() => {
-    dispatch(fetchTeams());
-  }, [dispatch]);
+    dispatch(fetchTeams())
+  }, [dispatch])
 
-  const [PlayerData, setPlayerData] = useState({
+  const [TeamData, setTeamData] = useState({
     name: '',
-    phone: '',
-    position: '',
+    city: '',
+    neighborhood: '',
+    manager: '',
+    managerPhone: '',
     image: '',
-    teamId: '',
   });
 
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [selectedFile, setSelectedFile] = useState(null);
   const [imageDefault, setImageDefault] = useState(imageDefaultA);
-  const [selectedTeamId, setSelectedTeamId] = useState('');
-  const [selectedPosition, setSelectedPosition] = useState('');
-
-  const handleChangeSelectPosition = (event) => {
-    const selectedPosition = event.target.value;
-    setSelectedPosition(selectedPosition);
-    setPlayerData((prevData) => ({ ...prevData, position: selectedPosition }));
-  };
-
-  const handleChangeSelectTeam = (event) => {
-    const selectedTeamId = parseInt(event.target.value);
-    setSelectedTeamId(selectedTeamId);
-    setPlayerData((prevData) => ({ ...prevData, teamId: selectedTeamId }));
-  };
+  
 
   const handleChange = async (event) => {
-  if (event.target.name === 'image') {
-    const file = event.target.files[0];
-    setSelectedFile(file);
-    setImageDefault(URL.createObjectURL(file));
+    if(event.target.name === 'image') {
+      const file = event.target.files[0]
+      setSelectedFile(file)
+      setImageDefault(URL.createObjectURL(file))
 
-    try {
-      const imageUrl = await uploadFile(file);
-      setPlayerData((prevData) => ({
+      try {
+        const imageUrl = await uploadFile(file);
+        setTeamData((prevData) => ({
+          ...prevData,
+          image: imageUrl,
+        }));
+      } catch (error) {
+        console.error('Error uploading file:', error);
+      }
+    } else {
+      setTeamData((prevData) => ({
         ...prevData,
-        image: imageUrl,
+        [event.target.name]: event.target.value,
       }));
-    } catch (error) {
-      console.error('Error uploading file:', error);
     }
-  } else {
-    setPlayerData((prevData) => ({
-      ...prevData,
-      [event.target.name]: event.target.value,
-    }));
   }
-};
-
 
   const hanleSuccessfullRegister = () => {
     onClose();
     showtoast();
   };
-
+  
   const handleSubmit = async (event) => {
     event.preventDefault();
     setIsLoading(true);
-    
-    const fieldErrors = validation(PlayerData);
+
+    const fieldErrors = validation(TeamData);
     setErrors(fieldErrors);
 
     if (Object.keys(fieldErrors).length === 0) {
       try {
-        const response = await fetch(`${ApiUrl}/players`, {
+        const response = await fetch(`${ApiUrl}/teams`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(PlayerData),
+          body: JSON.stringify(TeamData),
         });
 
-      if (response.status === 201) {
+        if (response.status === 201) {
           const data = await response.json();
           console.log(data);
-          dispatch(fetchPlayers());
+          dispatch(fetchTeams());
           hanleSuccessfullRegister();
         } else {
           const errorData = await response.json();
           console.log(errorData);
         }
-      } catch (error) {
+      }
+      catch (error) {
         console.log(error);
       }
     }
     setIsLoading(false);
-  };
-
+  }
 
   return (
     <section className="overflow-y-scroll flex flex-wrap fixed top-0 left-0 z-50 w-full h-full items-center justify-center bg-black bg-opacity-50">
@@ -160,52 +145,45 @@ const CreatePlayer = ({ onClose, showtoast }) => {
                   />
                 </div>
                 <input
-                  type="phone"
-                  name="phone"
-                  id="phone"
-                  title="Ingrese el Teléfono"
+                  type="text"
+                  name="city"
+                  id="city"
+                  title="Ingrese la ciudad"
                   className="border border-black sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 placeholder-black dark:placeholder-gray-400 dark:text-white text-black focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Teléfono"
+                  placeholder="Ciudad"
                   required=""
                   onChange={handleChange}
                 />
-                <select
+                <input
                   type="text"
-                  name="position"
-                  id="position"
-                  title="Seleccione la posición"
+                  name="neighborhood"
+                  id="neighborhood"
+                  title="Ingrese el barrio"
                   className="border border-black sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 placeholder-black dark:placeholder-gray-400 dark:text-white text-black focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Posición"
+                  placeholder="Barrio"
                   required=""
-                  value={selectedPosition}
-                  onChange={handleChangeSelectPosition}
-                >
-                  <option value="" disabled>Seleccione la posición</option>
-                  <option value="Portero">Portero</option>
-                  <option value="Defensa">Defensa</option>
-                  <option value="Medio Campo">Medio Campo</option>
-                  <option value="Delantero">Delantero</option>
-                </select>
-                <select
+                  onChange={handleChange}
+                />
+                <input
                   type="text"
-                  name="teamId"
-                  id="teamId"
-                  title="Seleccione un Equipo"
+                  name="manager"
+                  id="manager"
+                  title="Ingrese el nombre del entrenador o manager"
                   className="border border-black sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 placeholder-black dark:placeholder-gray-400 dark:text-white text-black focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Equipo"
+                  placeholder="Entrenador o Manager"
                   required=""
-                  value={selectedTeamId}
-                  onChange={handleChangeSelectTeam}
-                >
-                  <option value="" disabled>
-                    Seleccione un Equipo
-                  </option>
-                  {teams?.map((team) => (
-                    <option key={team.id} value={team.id}>
-                      {team.name}
-                    </option>
-                  ))}
-                </select>
+                  onChange={handleChange}
+                />
+                <input
+                  type="phone"
+                  name="managerPhone"
+                  id="managerPhone"
+                  title="Ingrese el teléfono del entrenador o manager"
+                  className="border border-black sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 placeholder-black dark:placeholder-gray-400 dark:text-white text-black focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Teléfono del entrenador o manager"
+                  required=""
+                  onChange={handleChange}
+                />
                 {errors && <AlertMessage errorMsg={errors.fields} />}
                 <div className="flex flex-wrap justify-center space-x-4">
                   <button
@@ -230,4 +208,4 @@ const CreatePlayer = ({ onClose, showtoast }) => {
   );
 };
 
-export default CreatePlayer;
+export default CreateTeam;

@@ -1,56 +1,35 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchPlayers, selectPlayers } from '../../redux/features/playersSlice';
+import { useNavigate } from 'react-router-dom';
 import { fetchTeams, selectTeams } from '../../redux/features/teamsSlice';
+import { uploadFile } from '../../utils/firebase/config';
 import ApiUrl from '../../utils/ApiUrl';
 import Spinner from '../../components/Spinner';
-import { uploadFile } from '../../utils/firebase/config';
-import imageDefaultA from '../../assets/ImageDefault.jpg';
-import { useNavigate } from 'react-router-dom';
+import imageDefaultA from '../../assets/imageTeamDefault.png';
 
-
-const UpdatePlayer = ({ id, onClose }) => {
+const UpdateTeam = ({ id, onClose }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const players = useSelector(selectPlayers);
   const teams = useSelector(selectTeams);
 
   useEffect(() => {
-    dispatch(fetchPlayers());
-    dispatch(fetchTeams());
-  }, [dispatch]);
+    dispatch(fetchTeams())
+  }, [dispatch])
 
-  const playerUpdate = players?.find((player) => player.id === id);
+  const teamUpdate = teams.find(team => team.id === id)
 
-  const [PlayerData, setPlayerData] = useState({
+  const [TeamData, setTeamData] = useState({
     name: '',
-    phone: '',
-    position: '',
+    city: '',
+    neighborhood: '',
+    manager: '',
+    managerPhone: '',
     image: '',
-    teamId: '',
   });
-
 
   const [isLoading, setIsLoading] = useState(false);
   const [modifiedFields, setModifiedFields] = useState({});
-  const [selectedTeamId, setSelectedTeamId] = useState('');
-  const [selectedPosition, setSelectedPosition] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
-
-  
-  const handleChangeSelectPosition = (event) => {
-    const newPosition = event.target.value;
-    setSelectedPosition(newPosition);
-    setPlayerData((prevData) => ({ ...prevData, position: selectedPosition }));
-    setModifiedFields({ ...modifiedFields, position: newPosition });
-  };
-  
-  const handleChangeSelectTeam = (event) => {
-    const newTeam = parseInt(event.target.value);
-    setSelectedTeamId(newTeam);
-    setPlayerData((prevData) => ({ ...prevData, teamId: selectedTeamId }));
-    setModifiedFields({ ...modifiedFields, teamId: newTeam});
-  };
 
   const handleChange = async (event) => {
     if (event.target.name === 'image') {
@@ -59,7 +38,7 @@ const UpdatePlayer = ({ id, onClose }) => {
 
       try {
         const imageUrl = await uploadFile(file);
-        setPlayerData((prevData) => ({
+        setTeamData((prevData) => ({
           ...prevData,
           image: imageUrl,
         }));
@@ -68,19 +47,22 @@ const UpdatePlayer = ({ id, onClose }) => {
         console.error('Error uploading file:', error);
       }
     } else {
-      setPlayerData((prevData) => ({
+      setTeamData((prevData) => ({
         ...prevData,
         [event.target.name]: event.target.value,
       }));
-      setModifiedFields({ ...modifiedFields, [event.target.name]: event.target.value });
+      setModifiedFields({
+        ...modifiedFields,
+        [event.target.name]: event.target.value,
+      });
     }
   };
-  
+
   const handleSuccessFullUpdate = () => {
-    dispatch(fetchPlayers());
+    dispatch(fetchTeams());
     onClose();
-    navigate('/players');
-  }
+    navigate('/teams');
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -88,10 +70,10 @@ const UpdatePlayer = ({ id, onClose }) => {
 
     const modifiedData = {};
     for (const fieldName in modifiedFields) {
-      modifiedData[fieldName] = PlayerData[fieldName];
+      modifiedData[fieldName] = TeamData[fieldName];
     }
     try {
-      const response = await fetch(`${ApiUrl}/players/${id}`, {
+      const response = await fetch(`${ApiUrl}/teams/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -104,7 +86,7 @@ const UpdatePlayer = ({ id, onClose }) => {
         handleSuccessFullUpdate();
       } else {
         const data = await response.json();
-        console.log('data', data)
+        console.log('data', data);
       }
     } catch (error) {
       console.error(error);
@@ -112,10 +94,8 @@ const UpdatePlayer = ({ id, onClose }) => {
     }
   };
 
-  
   return (
-    <div>
-      <section className="overflow-y-scroll flex flex-wrap fixed top-0 left-0 z-50 w-full h-full items-center justify-center bg-black bg-opacity-50">
+    <section className="overflow-y-scroll flex flex-wrap fixed top-0 left-0 z-50 w-full h-full items-center justify-center bg-black bg-opacity-50">
         <div className="flex flex-col flex-wrap w-full items-center justify-center px-6 py-8 mx-auto ">
           <div className="w-full h-max bg-gray-700 dark:bg-gray-800 dark:border-gray-100 rounded-lg shadow border md:mt-0 sm:max-w-md xl:p-0">
             <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
@@ -141,8 +121,8 @@ const UpdatePlayer = ({ id, onClose }) => {
                     src={
                       selectedFile
                         ? URL.createObjectURL(selectedFile)
-                        : playerUpdate.image
-                        ? playerUpdate.image===""
+                        : teamUpdate.image
+                        ? teamUpdate.image===""
                         : imageDefaultA
                     }
                   />
@@ -165,60 +145,54 @@ const UpdatePlayer = ({ id, onClose }) => {
                       className="border border-black sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 placeholder-black dark:placeholder-gray-400 dark:text-white text-black focus:ring-blue-500 focus:border-blue-500"
                       placeholder="Nombre"
                       required=""
-                      defaultValue={playerUpdate?.name}
+                      defaultValue={teamUpdate?.name}
                       onChange={handleChange}
                     />
                   </div>
-                  <input
-                    type="phone"
-                    name="phone"
-                    id="phone"
-                    title="Ingrese el Teléfono"
-                    className="border border-black sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 placeholder-black dark:placeholder-gray-400 dark:text-white text-black focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Teléfono"
-                    required=""
-                    defaultValue={playerUpdate?.phone}
-                    onChange={handleChange}
-                  />
-                  <select
-                    type="text"
-                    name="position"
-                    id="position"
-                    title="Seleccione la posición"
-                    className="border border-black sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 placeholder-black dark:placeholder-gray-400 dark:text-white text-black focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Posición"
-                    required=""
-                    defaultValue={playerUpdate?.position}
-                    onChange={handleChangeSelectPosition}
-                  >
-                    <option value="" disabled>Seleccione la posición</option>
-                    <option value="Portero">Portero</option>
-                    <option value="Defensa">Defensa</option>
-                    <option value="Medio Campo">Medio Campo</option>
-                    <option value="Delantero">Delantero</option>
-                  </select>
-                  <select
-                    type="text"
-                    name="teamId"
-                    id="teamId"
-                    title="Seleccione un Equipo"
-                    className="border border-black sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 placeholder-black dark:placeholder-gray-400 dark:text-white text-black focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Equipo"
-                    required=""
-                    defaultValue={playerUpdate?.teamId}
-                    onChange={handleChangeSelectTeam}
-                  >
-                    <option value="" disabled>
-                      Seleccione un Equipo
-                    </option>
-                    {[...teams]
-                      .sort((a, b) => a.name.localeCompare(b.name))
-                      .map((team, index) => (
-                        <option key={index} value={team.id}>
-                          {team.name}
-                        </option>
-                      ))}
-                  </select>
+                    <input
+                      type="text"
+                      name="city"
+                      id="city"
+                      title="Ingrese la ciudad"
+                      className="border border-black sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 placeholder-black dark:placeholder-gray-400 dark:text-white text-black focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Ciudad"
+                      required=""
+                      defaultValue={teamUpdate?.city}
+                      onChange={handleChange}
+                    />
+                    <input
+                      type="text"
+                      name="neighborhood"
+                      id="neighborhood"
+                      title="Ingrese el barrio"
+                      className="border border-black sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 placeholder-black dark:placeholder-gray-400 dark:text-white text-black focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Barrio"
+                      required=""
+                      defaultValue={teamUpdate?.neighborhood}
+                      onChange={handleChange}
+                    />
+                    <input
+                      type="text"
+                      name="manager"
+                      id="manager"
+                      title="Ingrese el nombre del entrenador o manager"
+                      className="border border-black sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 placeholder-black dark:placeholder-gray-400 dark:text-white text-black focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Entrenador o Manager"
+                      required=""
+                      defaultValue={teamUpdate?.manager}
+                      onChange={handleChange}
+                    />
+                    <input
+                      type="phone"
+                      name="managerPhone"
+                      id="managerPhone"
+                      title="Ingrese el teléfono del entrenador o manager"
+                      className="border border-black sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 placeholder-black dark:placeholder-gray-400 dark:text-white text-black focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Teléfono del entrenador o manager"
+                      required=""
+                      defaultValue={teamUpdate?.managerPhone}
+                      onChange={handleChange}
+                    />
                   <div className="flex flex-wrap justify-center space-x-4">
                     <button
                       type="submit"
@@ -230,17 +204,16 @@ const UpdatePlayer = ({ id, onClose }) => {
                       className="w-24 text-white bg-blue-600 hover:bg-red-500 focus:ring-4 focus:outline-none focus:ring-red-800 font-medium rounded-lg text-sm py-2.5 text-center"
                       onClick={() => onClose()}
                     >
-                      Cancelar
-                    </button>
-                  </div>
-                </form>
-              )}
-            </div>
+                    Cancelar
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         </div>
-      </section>
-    </div>
+      </div>
+    </section>
   );
 };
 
-export default UpdatePlayer;
+export default UpdateTeam;
