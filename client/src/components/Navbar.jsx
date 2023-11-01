@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import {MobileMenu} from '../icons';
 import { useNavigate } from 'react-router-dom';
+import icono from '../assets/icono.png';
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -13,8 +14,9 @@ const Navbar = () => {
   return (
     <nav className="bg-gray-800 p-4">
       <div className="flex items-center justify-between">
+        <img src={icono} alt="icono" className="w-10 h-10" />
         <div className="flex items-center flex-shrink-0 text-white mr-6">
-          <span className="font-semibold text-xl tracking-tight">Navbar</span>
+          <span className="font-semibold text-2xl tracking-tight">PROGRAMA TÚ FÚTBOL</span>
         </div>
         <div className="hidden md:block">
           <div className="flex space-x-4">

@@ -91,8 +91,7 @@ const CreatePlayer = ({ onClose, showtoast }) => {
         });
 
       if (response.status === 201) {
-          const data = await response.json();
-          console.log(data);
+          await response.json();
           dispatch(fetchPlayers());
           hanleSuccessfullRegister();
         } else {

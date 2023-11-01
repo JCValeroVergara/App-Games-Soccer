@@ -30,13 +30,13 @@ const DeleteTeam = ({ onClose, id, name, city }) => {
       });
 
       if (response.status === 200) {
-        const data = await response.json();
-        console.log('se ha eliminado el registro', data);
+        await response.json();
+        
         handleSuccessFull();
         setIsLoading(false);
       } else {
-        const data = await response.json();
-        console.log('data', data);
+        const errorData = await response.json();
+        console.log(errorData);
       }
     } catch (error) {
       console.error(error);

@@ -1,0 +1,36 @@
+/* Estilos para dispositivos móviles */
+@media only screen and (max-width: 600px) {
+  /* Cambiar el diseño de la tabla a uno de tipo lista */
+  .table-container {
+    display: block;
+    overflow-x: auto;
+  }
+
+  .table-auto {
+    display: block;
+    width: 100%;
+  }
+
+  .table-auto thead {
+    display: none;
+  }
+
+  .table-auto tr {
+    display: flex;
+    flex-direction: column;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .table-auto td {
+    display: flex;
+    align-items: center;
+    padding: 6px;
+  }
+
+  .table-auto td::before {
+    /* Agregar etiquetas de encabezado para cada fila */
+    content: attr(title);
+    font-weight: bold;
+    margin-right: 10px;
+  }
+}

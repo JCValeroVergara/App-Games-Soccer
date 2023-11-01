@@ -99,12 +99,11 @@ const UpdatePlayer = ({ id, onClose }) => {
         body: JSON.stringify(modifiedData),
       });
       if (response.status === 200) {
-        const data = await response.json();
-        console.log('se ha actualizado el registro', data);
+        await response.json();
         handleSuccessFullUpdate();
       } else {
-        const data = await response.json();
-        console.log('data', data)
+        const errorData = await response.json();
+        console.log(errorData);
       }
     } catch (error) {
       console.error(error);
@@ -142,7 +141,7 @@ const UpdatePlayer = ({ id, onClose }) => {
                       selectedFile
                         ? URL.createObjectURL(selectedFile)
                         : playerUpdate.image
-                        ? playerUpdate.image===""
+                        ? playerUpdate.image
                         : imageDefaultA
                     }
                   />

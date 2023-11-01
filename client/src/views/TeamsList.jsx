@@ -66,7 +66,6 @@ const TeamsList = () => {
         />
       )}
       <div className="flex flex-col w-full h-screen">
-        <h1>PlayersList</h1>
         <div className="flex mx-8 items-center space-x-2 justify-end">
           <button
             title="Buscar"

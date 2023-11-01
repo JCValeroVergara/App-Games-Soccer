@@ -34,11 +34,7 @@ const CardTeam = ({ id, name, city, neighborhood, manager, managerPhone, image }
   return (
     <>
       {activeForm === 'update' && (
-        <UpdateTeam
-          id={teamSelected}
-          name={name}
-          onClose={handleCloseUpdate}
-        />
+        <UpdateTeam id={teamSelected} name={name} onClose={handleCloseUpdate} />
       )}
       {activeForm === 'delete' && (
         <DeleteTeam
@@ -49,7 +45,7 @@ const CardTeam = ({ id, name, city, neighborhood, manager, managerPhone, image }
         />
       )}
       <div className="p-4">
-        <div className="flex flex-col max-w-sm h-80 rounded justify-between overflow-hidden shadow-md shadow-emerald-400 bg-slate-100">
+        <div className="flex flex-col max-w-sm h-80 rounded justify-between overflow-hidden shadow-md shadow-emerald-400 bg-slate-100 bg-opacity-70">
           <div className="mt-2 flex items-center justify-center">
             <img
               className={`dark:text-white transition-transform transform w-32 h-32 rounded-md ring-2 object-cover opacity-100 scale-100"}`}
@@ -59,9 +55,8 @@ const CardTeam = ({ id, name, city, neighborhood, manager, managerPhone, image }
           </div>
           <div className="px-6 py-4">
             <div className="font-bold text-xl mb-1">{name}</div>
-            <p className="text-gray-700 text-sm">{city}</p>
-            <p className="text-gray-700 text-sm">{neighborhood}</p>
-            <p className="text-gray-700 text-xs">{manager}</p>
+            <p className="text-gray-700 text-sm">{city} - {neighborhood}</p>
+            <p className="text-gray-700 text-base">Manager : {manager}</p>
             <p className="text-gray-700 text-xs">{managerPhone}</p>
           </div>
           <div className="flex justify-end px-6 space-x-2 pb-2">

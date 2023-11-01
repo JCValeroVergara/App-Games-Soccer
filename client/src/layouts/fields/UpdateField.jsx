@@ -1,95 +1,98 @@
 import React, { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { fetchTeams} from '../../redux/features/teamsSlice';
-import validation from '../../validations/validationsTeams';
-import ApiUrl from '../../utils/ApiUrl';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { fetchFields, selectFields } from '../../redux/features/fieldsSlice';
 import { uploadFile } from '../../utils/firebase/config';
-import imageDefaultA from '../../assets/imageTeamDefault.png';
-import AlertMessage from '../../components/AlertMessage';
+import ApiUrl from '../../utils/ApiUrl';
 import Spinner from '../../components/Spinner';
+import imageDefaultA from '../../assets/imageFieldDefault.jpeg';
 
-const CreateTeam = ({ onClose, showtoast }) => {
+
+const UpdateField = ({ id, onClose }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const fields = useSelector(selectFields);
 
   useEffect(() => {
-    dispatch(fetchTeams())
+    dispatch(fetchFields())
   }, [dispatch])
 
-  const [TeamData, setTeamData] = useState({
+  const fieldUpdate = fields.find(team => team.id === id)
+
+  const [FieldData, setFieldData] = useState({
     name: '',
     city: '',
     neighborhood: '',
-    manager: '',
-    managerPhone: '',
+    address: '',
+    phone: '',
     image: '',
   });
 
   const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState({});
+  const [modifiedFields, setModifiedFields] = useState({});
   const [selectedFile, setSelectedFile] = useState(null);
-  const [imageDefault, setImageDefault] = useState(imageDefaultA);
-  
 
   const handleChange = async (event) => {
-    if(event.target.name === 'image') {
-      const file = event.target.files[0]
-      setSelectedFile(file)
-      setImageDefault(URL.createObjectURL(file))
+    if (event.target.name === 'image') {
+      const file = event.target.files[0];
+      setSelectedFile(file);
 
       try {
         const imageUrl = await uploadFile(file);
-        setTeamData((prevData) => ({
+        setFieldData((prevData) => ({
           ...prevData,
           image: imageUrl,
         }));
+        setModifiedFields({ ...modifiedFields, image: imageUrl });
       } catch (error) {
         console.error('Error uploading file:', error);
       }
     } else {
-      setTeamData((prevData) => ({
+      setFieldData((prevData) => ({
         ...prevData,
         [event.target.name]: event.target.value,
       }));
+      setModifiedFields({
+        ...modifiedFields,
+        [event.target.name]: event.target.value,
+      });
     }
-  }
-
-  const hanleSuccessfullRegister = () => {
-    onClose();
-    showtoast();
   };
-  
+
+  const handleSuccessFullUpdate = () => {
+    dispatch(fetchFields());
+    onClose();
+    navigate('/fields');
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setIsLoading(true);
 
-    const fieldErrors = validation(TeamData);
-    setErrors(fieldErrors);
-
-    if (Object.keys(fieldErrors).length === 0) {
-      try {
-        const response = await fetch(`${ApiUrl}/teams`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(TeamData),
-        });
-
-        if (response.status === 201) {
-          await response.json();
-          dispatch(fetchTeams());
-          hanleSuccessfullRegister();
-        } else {
-          const errorData = await response.json();
-          console.log(errorData);
-        }
-      }
-      catch (error) {
-        console.log(error);
-      }
+    const modifiedData = {};
+    for (const fieldName in modifiedFields) {
+      modifiedData[fieldName] = FieldData[fieldName];
     }
-    setIsLoading(false);
-  }
+    try {
+      const response = await fetch(`${ApiUrl}/fields/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(modifiedData),
+      });
+      if (response.status === 200) {
+        await response.json();
+        handleSuccessFullUpdate();
+      } else {
+        const errorData = await response.json();
+        console.log(errorData);
+      }
+    } catch (error) {
+      console.error(error);
+      setIsLoading(false);
+    }
+  };
 
   return (
     <section className="overflow-y-scroll flex flex-wrap fixed top-0 left-0 z-50 w-full h-full items-center justify-center bg-black bg-opacity-50">
@@ -97,7 +100,7 @@ const CreateTeam = ({ onClose, showtoast }) => {
         <div className="w-full h-max bg-gray-700 dark:bg-gray-800 dark:border-gray-100 rounded-lg shadow border md:mt-0 sm:max-w-md xl:p-0">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
             <h1 className="text-slate-100 dark:text-white text-xl font-bold leading-tight tracking-tight  text-center">
-              Crea un nuevo Equipo
+              Actualiza los datos del Jugador
             </h1>
             {isLoading ? (
               <div className="flex w-full pb-8 justify-center items-center">
@@ -118,7 +121,9 @@ const CreateTeam = ({ onClose, showtoast }) => {
                   src={
                     selectedFile
                       ? URL.createObjectURL(selectedFile)
-                      : imageDefault
+                      : fieldUpdate.image
+                      ? fieldUpdate.image
+                      : imageDefaultA
                   }
                 />
                 <input
@@ -140,6 +145,7 @@ const CreateTeam = ({ onClose, showtoast }) => {
                     className="border border-black sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 placeholder-black dark:placeholder-gray-400 dark:text-white text-black focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Nombre"
                     required=""
+                    defaultValue={fieldUpdate?.name}
                     onChange={handleChange}
                   />
                 </div>
@@ -151,6 +157,7 @@ const CreateTeam = ({ onClose, showtoast }) => {
                   className="border border-black sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 placeholder-black dark:placeholder-gray-400 dark:text-white text-black focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Ciudad"
                   required=""
+                  defaultValue={fieldUpdate?.city}
                   onChange={handleChange}
                 />
                 <input
@@ -161,35 +168,37 @@ const CreateTeam = ({ onClose, showtoast }) => {
                   className="border border-black sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 placeholder-black dark:placeholder-gray-400 dark:text-white text-black focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Barrio"
                   required=""
+                  defaultValue={fieldUpdate?.neighborhood}
                   onChange={handleChange}
                 />
                 <input
                   type="text"
-                  name="manager"
-                  id="manager"
+                  name="address"
+                  id="address"
                   title="Ingrese el nombre del entrenador o manager"
                   className="border border-black sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 placeholder-black dark:placeholder-gray-400 dark:text-white text-black focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Entrenador o Manager"
+                  placeholder="Dirección"
                   required=""
+                  defaultValue={fieldUpdate?.address}
                   onChange={handleChange}
                 />
                 <input
                   type="phone"
-                  name="managerPhone"
-                  id="managerPhone"
+                  name="phone"
+                  id="phone"
                   title="Ingrese el teléfono del entrenador o manager"
                   className="border border-black sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 placeholder-black dark:placeholder-gray-400 dark:text-white text-black focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Teléfono del entrenador o manager"
+                  placeholder="Teléfono"
                   required=""
+                  defaultValue={fieldUpdate?.phone}
                   onChange={handleChange}
                 />
-                {errors && <AlertMessage errorMsg={errors.fields} />}
                 <div className="flex flex-wrap justify-center space-x-4">
                   <button
                     type="submit"
                     className="w-24 text-white bg-blue-600 hover:bg-green-500 focus:ring-4 focus:outline-none focus:ring-green-800 font-medium rounded-lg text-sm py-2.5 text-center"
                   >
-                    Crear
+                    Actualizar
                   </button>
                   <button
                     className="w-24 text-white bg-blue-600 hover:bg-red-500 focus:ring-4 focus:outline-none focus:ring-red-800 font-medium rounded-lg text-sm py-2.5 text-center"
@@ -207,4 +216,4 @@ const CreateTeam = ({ onClose, showtoast }) => {
   );
 };
 
-export default CreateTeam;
+export default UpdateField;

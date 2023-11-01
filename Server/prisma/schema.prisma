@@ -20,7 +20,7 @@ model Games {
   teamAwayId  Int
   field       Fields    @relation(fields: [fieldId], references: [id])
   fieldId     Int
-  status      String    @default("scheduled")
+  status      String
 }
 
 model Fields {
