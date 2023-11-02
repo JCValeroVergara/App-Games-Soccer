@@ -147,7 +147,7 @@ useEffect(() => {
                   </option>
                   {teams?.map((team, index) => (
                     <option key={index} value={team.id}>
-                      {team.name}
+                      {team.name} - {team.city}
                     </option>
                   ))}
                 </select>
@@ -167,7 +167,7 @@ useEffect(() => {
                   </option>
                   {teams?.map((team, index) => (
                     <option key={index} value={team.id}>
-                      {team.name}
+                      {team.name} - {team.city}
                     </option>
                   ))}
                 </select>
@@ -207,7 +207,7 @@ useEffect(() => {
                   </option>
                   {fields?.map((field, index) => (
                     <option key={index} value={field.id}>
-                      {field.name}
+                      {field.name} - {field.city}
                     </option>
                   ))}
                 </select>

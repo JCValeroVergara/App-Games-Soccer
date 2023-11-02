@@ -7,7 +7,6 @@ import ApiUrl from '../../utils/ApiUrl';
 import Spinner from '../../components/Spinner';
 import { useNavigate } from 'react-router-dom';
 import { fetchFields, selectFields } from '../../redux/features/fieldsSlice';
-import validateSelectedDateAndSchedule from '../../validations/validationsGameUpdate';
 import AlertMessage from '../../components/AlertMessage';
 
 
@@ -47,7 +46,7 @@ const UpdateGame = ({ id, onClose, showtoast }) => {
   const [previousSchedule, setPreviousSchedule] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
 
-
+  
   const handleSelectTeamHome = (event) => {
     const newTeamHomeId = parseInt(event.target.value);
     setSelectedTeamHomeId(newTeamHomeId);
@@ -70,31 +69,19 @@ const UpdateGame = ({ id, onClose, showtoast }) => {
   }
 
   const handleSelectStatus = (event) => {
-    const newStatus = event.target.value;
-    setSelectedStatus(newStatus);
-    setGameData((prevData) => ({ ...prevData, status: selectedStatus }));
-    setModifiedFields({ ...modifiedFields, status: newStatus });
+    const selectedStatus = event.target.value;
+    setSelectedStatus(selectedStatus);
+    setGameData({ ...GameData, status: selectedStatus });
+    setModifiedFields({ ...modifiedFields, status: selectedStatus });
   }
   
 
   const handleDateChange = (event) => {
     const { name, value } = event.target;
-
     if (name === 'date') {
       setSelectedDate(value);
-      if (selectedSchedule && !value) {
-        setErrors({ fields: 'Debes Actualizar Fecha y Hora.' });
-      } else {
-        setErrors({});
-      }
-    }
-    if (name === 'schedule') {
+    } else if (name === 'schedule') {
       setSelectedSchedule(value);
-      if (selectedDate && !value) {
-        setErrors({ fields: 'Debes Actualizar Fecha y Hora.' });
-      } else {
-        setErrors({});
-      }
     }
   };
 
@@ -133,27 +120,20 @@ const UpdateGame = ({ id, onClose, showtoast }) => {
     event.preventDefault();
     setIsLoading(true);
 
-    const modifiedData = {};
-
-    for (const fieldName in modifiedFields) {
-      if (modifiedFields[fieldName]) {
-        modifiedData[fieldName] = GameData[fieldName];
-      }
-    }
-    
-    const fieldErrors = validateSelectedDateAndSchedule(modifiedData.date, modifiedData.schedule);
-    
-
-    if (Object.keys(fieldErrors).length > 0) {
-      setErrors(fieldErrors);
-      setIsLoading(false);
-      return;
-    }
-    const { date, schedule } = modifiedData;
-    if (!date || !schedule) {
+    const modifiedData = { ...GameData };
+    // Validación para fecha y hora juntas
+    if (
+      (!selectedDate && selectedSchedule) ||
+      ( selectedDate && !selectedSchedule)
+    ) {
       setErrors({ fields: 'Debes Actualizar Fecha y Hora.' });
       setIsLoading(false);
       return;
+    }
+    for (const key in modifiedData) {
+      if (modifiedData[key] === '') {
+        delete modifiedData[key];
+      }
     }
 
     try {
@@ -211,7 +191,7 @@ const UpdateGame = ({ id, onClose, showtoast }) => {
                   </option>
                   {teams?.map((team, index) => (
                     <option key={index} value={team.id}>
-                      {team.name}
+                      {team.name} - {team.city}
                     </option>
                   ))}
                 </select>
@@ -231,7 +211,7 @@ const UpdateGame = ({ id, onClose, showtoast }) => {
                   </option>
                   {teams?.map((team, index) => (
                     <option key={index} value={team.id}>
-                      {team.name}
+                      {team.name} - {team.city}
                     </option>
                   ))}
                 </select>
@@ -295,7 +275,7 @@ const UpdateGame = ({ id, onClose, showtoast }) => {
                   </option>
                   {fields?.map((field, index) => (
                     <option key={index} value={field.id}>
-                      {field.name}
+                      {field.name} - {field.city}
                     </option>
                   ))}
                 </select>
@@ -316,6 +296,7 @@ const UpdateGame = ({ id, onClose, showtoast }) => {
                   <option value="Programado">Programado</option>
                   <option value="Aplazado">Aplazado</option>
                   <option value="En Curso">En Curso</option>
+                  <option value="Finalizado">Finalizado</option>
                 </select>
 
                 {errors && <AlertMessage errorMsg={errors.fields} />}

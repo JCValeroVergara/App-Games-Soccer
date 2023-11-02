@@ -14,7 +14,7 @@ const Navbar = () => {
   return (
     <nav className="bg-gray-800 p-4">
       <div className="flex items-center justify-between space-x-2">
-        <img src={icono} alt="icono" className="w-10 h-10 rounded-full" />
+        <img src={icono} alt="icono" className="w-10 h-10" />
         <div className="flex items-center flex-shrink-0 text-white">
           <span className="font-semibold text-2xl tracking-tight">PROGRAMA TÚ FÚTBOL</span>
         </div>

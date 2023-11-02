@@ -2,6 +2,7 @@ import '../../src/responsiveStyles.css'
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectGames, fetchGames } from '../redux/features/gamesSlice';
+import ImagenFieldDefault from '../assets/imageTeamDefault.png';
 import SuccesfullRegisterToast from '../components/SuccesfullRegisterToast';
 import { Add, Delete, Edit, Magnifier } from '../icons';
 import CreateGame from '../layouts/games/CreateGame';
@@ -32,6 +33,7 @@ const GamesList = () => {
         game.field.name.toLowerCase().includes(inputValue.toLowerCase())
       );
     }
+
     const currentDateTime = new Date().toISOString();
     filteredGames = filteredGames.filter((game) => game.date > currentDateTime);
     filteredGames.sort((a, b) => {
@@ -117,8 +119,14 @@ const handleMagnifierClick = () => {
           onClose={handleCloseDelete}
           showtoast={() => setIsSuccessFull(true)}
           id={gameSelected}
-          teamHome={filteredGames.find((game) => game.id === gameSelected)?.teamHome.name}
-          teamAway={filteredGames.find((game) => game.id === gameSelected)?.teamAway.name}
+          teamHome={
+            filteredGames.find((game) => game.id === gameSelected)?.teamHome
+              .name
+          }
+          teamAway={
+            filteredGames.find((game) => game.id === gameSelected)?.teamAway
+              .name
+          }
         />
       )}
       <div className="flex flex-col w-full h-screen">
@@ -195,7 +203,11 @@ const handleMagnifierClick = () => {
                   <td title="Local" className="px-6 py-2 text-xs">
                     <img
                       className="m-2 w-10 h-10 rounded-md ring-1 ring-emerald-500 object-cover"
-                      src={game.teamHome?.image}
+                      src={
+                        game.teamHome?.image
+                          ? game.teamHome?.image
+                          : ImagenFieldDefault
+                      }
                       alt="Team Home"
                     />
                     {game.teamHome?.name}
@@ -203,7 +215,11 @@ const handleMagnifierClick = () => {
                   <td title="Visita" className="px-6 py-2 text-xs">
                     <img
                       className="m-2 w-10 h-10 rounded-md ring-1 ring-emerald-500 object-cover"
-                      src={game.teamAway?.image}
+                      src={
+                        game.teamAway?.image
+                          ? game.teamAway?.image
+                          : ImagenFieldDefault
+                      }
                       alt="Team Away"
                     />
                     {game.teamAway?.name}
@@ -222,9 +238,10 @@ const handleMagnifierClick = () => {
                   </td>
                   <td
                     title="Cancha"
-                    className="px-6 py-2 font-medium text-gray-900  dark:text-gray-700"
+                    className="flex flex-col justify-center items-center text-center px-6 py-2 font-medium text-gray-900  dark:text-gray-700"
                   >
-                    {game.field?.name}
+                    <div>{game.field?.name}</div>
+                    <div>{game.field?.city && `${game.field?.city} - ${game.field?.neighborhood}`}</div>
                   </td>
                   <td
                     title="Status"
