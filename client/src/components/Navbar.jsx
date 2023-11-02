@@ -13,9 +13,9 @@ const Navbar = () => {
 
   return (
     <nav className="bg-gray-800 p-4">
-      <div className="flex items-center justify-between">
-        <img src={icono} alt="icono" className="w-10 h-10" />
-        <div className="flex items-center flex-shrink-0 text-white mr-6">
+      <div className="flex items-center justify-between space-x-2">
+        <img src={icono} alt="icono" className="w-10 h-10 rounded-full" />
+        <div className="flex items-center flex-shrink-0 text-white">
           <span className="font-semibold text-2xl tracking-tight">PROGRAMA TÚ FÚTBOL</span>
         </div>
         <div className="hidden md:block">
