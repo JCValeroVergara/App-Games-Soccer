@@ -106,7 +106,7 @@ const UpdateGame = ({ id, onClose, showtoast }) => {
         setPreviousSchedule(selectedSchedule);
       }
     }
-  }, [selectedDate, selectedSchedule, previousDate, previousSchedule]);
+  }, [selectedDate, selectedSchedule, previousDate, previousSchedule, modifiedFields]);
 
 
   const handleSuccessFullUpdate = () => {
